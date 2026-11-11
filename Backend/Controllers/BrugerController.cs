@@ -13,10 +13,26 @@ public class BrugerController : ControllerBase
     private readonly IBrugerRepo bRepo;
 
     [HttpGet]
-    [Route("getUser")]
-    public User getUserById(int id)
+    [Route("getUser/{id}")]
+    public User getUser(int id)
     {
-        return bRepo.getUserById(id);
+        return bRepo.getUser(id);
+    }
+
+    [HttpPost]
+    [Route("doLogin/{email}")]
+    public User Login(string email)
+    {
+        return bRepo.Login(email);
+    }
+
+    [HttpPost]
+    [Route("createUser")]
+    public void CreateUser([FromBody] User user)
+    //Vi får jo brugeren fra body, da en bruger laver brugeren ude i frontenden, som så bliver sendt som JSON.
+    //Heraf "from body"
+    {
+        bRepo.CreateUser(user);
     }
 
     /**

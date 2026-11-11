@@ -19,10 +19,23 @@ public class BrugerRepository : IBrugerRepo
         _brugerRepository = database.GetCollection<User>("Users");
     }
 
-    public User getUserById(int id)
+    public User getUser(int id)
     {
         var filter = Builders<User>.Filter.Eq("_id", id);
         return _brugerRepository.Find(filter).FirstOrDefault();
+    }
+
+    public User Login(string email)
+    {
+        var filter = Builders<User>.Filter.Eq("email", email);
+        return _brugerRepository.Find(filter).FirstOrDefault();
+        //samme kode som ovenfor, filter efter det man får ind i databasen, og få fat i den
+        //vi tjekker kun for email ved login, dvs. kodeord er null
+    }
+
+    public void CreateUser(User user)
+    {
+        _brugerRepository.InsertOne(user);
     }
 
     /**

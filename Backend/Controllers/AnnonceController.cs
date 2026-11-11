@@ -30,7 +30,7 @@ public class AnnonceController : ControllerBase
         return aRepo.GetAllAnnonces(); //kalder GetAll fra Repo
     }
 
-    [HttpPut]
+    [HttpPatch]
     [Route("toggle/{aID:int}")] //Får et annonce ID, som er integer, som defineret i klassen
     public void PutToggleBought(int aID)
     {
@@ -43,4 +43,13 @@ public class AnnonceController : ControllerBase
     {
         aRepo.DeleteAnnonce(aID);
     }
+
+    [HttpPatch]
+    [Route("buy/{aID:int}")]
+    public void BuyAnnonce(int aID)
+    {
+        aRepo.BuyAnnonce(aID);
+    }
+    
+    
 }

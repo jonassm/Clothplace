@@ -13,4 +13,6 @@ public interface IAnnonceRepo
 
     public void DeleteAnnonce(int aID);
 
+    public void BuyAnnonce(int aID);
+
 }

@@ -46,7 +46,6 @@ public class AnnonceRepository : IAnnonceRepo
         //Laver tom filter (altså det hele) og sender til listen.
         return _annonceRepository.Find(Builders<Annonce>.Filter.Empty).ToList();
     }
-
     public void PutToggleBought(int aID)
     { 
         var filter = Builders<Annonce>.Filter.Eq(a => a.aID, aID);
@@ -69,4 +68,11 @@ public class AnnonceRepository : IAnnonceRepo
         _annonceRepository.DeleteOne(filter);
         //slet den
     }
+
+/*    public void BuyAnnonce(int aID)
+    {
+        var filter = Builders<Annonce>.Filter.Eq(a => a.aID, aID);
+        _annonceRepository.
+    }
+    */
 }
