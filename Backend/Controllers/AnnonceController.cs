@@ -10,7 +10,7 @@ namespace Backend.Controllers;
 [Route("api/controller")]
 public class AnnonceController : ControllerBase
 {
-    private readonly IAnnonceRepo aRepo;
+    private readonly IAnnonceRepo aRepo = new AnnonceRepository();
 
     [HttpPost]
     [Route("create")]
@@ -29,18 +29,27 @@ public class AnnonceController : ControllerBase
     {
         return aRepo.GetAllAnnonces(); //kalder GetAll fra Repo
     }
-
-    [HttpPut]
+/*
+    [HttpPatch]
     [Route("toggle/{aID:int}")] //Får et annonce ID, som er integer, som defineret i klassen
     public void PutToggleBought(int aID)
     {
         aRepo.PutToggleBought(aID); //kald toggle på repo
     }
-
+*/
     [HttpDelete]
     [Route("delete/{aID:int}")] //samme som ovenfor
     public void DeleteAnnonce(int aID)
     {
         aRepo.DeleteAnnonce(aID);
     }
+
+    [HttpPatch]
+    [Route("buy/{aID:int}")]
+    public void BuyAnnonce(int aID, int BuyerId)
+    {
+        aRepo.BuyAnnonce(aID, BuyerId);
+    }
+    
+    
 }
