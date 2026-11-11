@@ -1,5 +1,13 @@
+using MongoDB.Bson.Serialization.Attributes;
+
 namespace Core;
 
+[BsonIgnoreExtraElements]
+/*
+ * Denne attribut siger til mongodb, at den ikke selv skal tilføje ekstra ting. Det er relevant, da
+ * mongodb laver sin egen lange _id streng, som vi ikke kan bruge til noget. Men når vi laver en udiskrimnatorisk get funktion, brokker
+ * systemet sig gevaldigt grundet denne header.
+ */
 public class Annonce
 {
     public int aID { get; set; }

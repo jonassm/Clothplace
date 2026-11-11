@@ -30,6 +30,10 @@ builder.Services.AddCors(options =>
         });
 });
 builder.Services.AddOpenApi();
+builder.Services.AddSingleton<IAnnonceRepo, AnnonceRepository>();
+builder.Services.AddSingleton<IBrugerRepo, BrugerRepository>();
+builder.Services.AddSingleton<IPurchaseRepo, PurchaseRepository>();
+//Modul 15 note. Vi laver et repo objekt serveren bruger.
 
 var app = builder.Build();
 

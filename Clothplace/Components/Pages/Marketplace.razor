@@ -1,0 +1,44 @@
+﻿@page "/Marketplace"
+@using Core;
+@inject HttpClient Http
+
+<PageTitle>Marketplace</PageTitle>
+
+<h3>Marketplace</h3>
+
+@if (getting) //hvis vi bare laver null tjek på annoncer, vil det aldrig blive skrevet.
+    //da annoncer objektet dannes med det samme, og altså ikke er null
+{
+    <p>Henter...</p>
+}
+else if (annoncer.Count == 0) { //Ingen grund til at skrive henter hvis der bare ikke er noget på siden. Self. low risk dog
+    <p>Ingen annoncer at hente</p>
+}
+else
+{
+    @foreach (var a in annoncer)
+    {
+        <div>@a.Name , @a.Pris</div> //best case scenario, vi kan skrive ind!
+    }
+}
+
+@code {
+
+    private List<Annonce> annoncer = new List<Annonce>();
+
+    private bool getting; //Lav et bool, der ændres til false når man har hentet det hele. Den starter i true, derfor ingen definition her.
+    private async Task loadAnnonces()
+    {
+        annoncer = await Http.GetFromJsonAsync<List<Annonce>>("api/Annonce/get") ?? new List<Annonce>();
+        getting = false; //nu har vi hentet, så...
+    }
+
+    protected override async Task OnInitializedAsync() //ved init kalder vi load annoncer.
+    {
+        await loadAnnonces();
+    }
+
+
+
+
+}

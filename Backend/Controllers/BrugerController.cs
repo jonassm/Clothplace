@@ -10,7 +10,12 @@ namespace Backend.Controllers;
 [Route("api/Bruger")]
 public class BrugerController : ControllerBase
 {
-    private readonly IBrugerRepo bRepo = new BrugerRepository();
+    private IBrugerRepo bRepo;
+
+    public BrugerController(IBrugerRepo repo)
+    {
+        bRepo = repo;
+    }
 
     [HttpGet]
     [Route("getUser/{id}")]
