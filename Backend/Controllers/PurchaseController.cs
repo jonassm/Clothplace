@@ -11,7 +11,12 @@ namespace Backend.Controllers;
 [Route("api/Purchases")]
 public class PurchaseController : ControllerBase
 {
-    private readonly IPurchaseRepo pRepo = new PurchaseRepository();
+    private IPurchaseRepo pRepo;
+
+    public PurchaseController(IPurchaseRepo repo)
+    {
+        pRepo = repo;
+    }
     
     [HttpGet]
     [Route("getCar")]

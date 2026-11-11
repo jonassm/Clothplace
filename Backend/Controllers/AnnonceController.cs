@@ -7,10 +7,15 @@ using Core;
 namespace Backend.Controllers;
 
 [ApiController]
-[Route("api/controller")]
+[Route("api/Annonce")]
 public class AnnonceController : ControllerBase
 {
-    private readonly IAnnonceRepo aRepo = new AnnonceRepository();
+    private IAnnonceRepo aRepo;
+
+    public AnnonceController(IAnnonceRepo repo)
+    {
+        aRepo = repo;
+    }
 
     [HttpPost]
     [Route("create")]
