@@ -1,9 +1,38 @@
 ﻿@page "/Markedplace"
+@using Core;
+@inject HttpClient Http
 
 <PageTitle>Markedplace</PageTitle>
 
 <h3>Markedplace</h3>
 
+@if (annoncer == null)
+{
+    <p>Henter...</p>
+}
+else
+{
+    @foreach (var a in annoncer)
+    {
+        <div>@a.ToString</div>
+    }
+}
+
 @code {
+
+    private List<Annonce> annoncer = new List<Annonce>();
+
+    private async Task loadAnnonces()
+    {
+        annoncer = await Http.GetFromJsonAsync<List<Annonce>>("api/controller/get");
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        loadAnnonces();
+    }
     
+    
+
+
 }
