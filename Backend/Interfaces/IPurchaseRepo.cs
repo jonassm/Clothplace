@@ -1,6 +1,7 @@
+using Core;
 namespace Backend.Repositories.Interfaces;
 
-public class IPurchaseRepo
+public interface IPurchaseRepo
 {
-    
+    public List<Purchase> getPurchaseByBuyerId(int id);
 }
