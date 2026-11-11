@@ -10,7 +10,7 @@ namespace Backend.Controllers;
 [Route("api/Bruger")]
 public class BrugerController : ControllerBase
 {
-    private readonly IBrugerRepo bRepo;
+    private readonly IBrugerRepo bRepo = new BrugerRepository();
 
     [HttpGet]
     [Route("getUser/{id}")]
@@ -35,12 +35,4 @@ public class BrugerController : ControllerBase
         bRepo.CreateUser(user);
     }
 
-    /**
-    [HttpGet]
-    [Route("getPassword")]
-    public string getPasswordByName()
-    {
-        
-    }
-    **/
 }
