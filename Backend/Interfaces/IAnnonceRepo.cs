@@ -9,10 +9,10 @@ public interface IAnnonceRepo
 
     public List<Annonce> GetAllAnnonces();
 
-    public void PutToggleBought(int aID);
+    //public void PutToggleBought(int aID);
 
     public void DeleteAnnonce(int aID);
 
-    public void BuyAnnonce(int aID);
+    public void BuyAnnonce(int aID, int BuyerId);
 
 }

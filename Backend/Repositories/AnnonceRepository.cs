@@ -43,21 +43,9 @@ public class AnnonceRepository : IAnnonceRepo
 
     public List<Annonce> GetAllAnnonces()
     {
-        //Laver tom filter (altså det hele) og sender til listen.
-        return _annonceRepository.Find(Builders<Annonce>.Filter.Empty).ToList();
-    }
-    public void PutToggleBought(int aID)
-    { 
-        var filter = Builders<Annonce>.Filter.Eq(a => a.aID, aID);
-        //Start med at finde den annonce vi skal ændre via ID.
-        var annonce = _annonceRepository.Find(filter).FirstOrDefault();
-        //Tag fat i den row i databasen.
-        //her burde man lave prækondtion tjek for om den findes
-        var toggle = Builders<Annonce>.Update
-            .Set(a => a.BuyStatus, !annonce.BuyStatus);
-        //Laver update til databasen, hvor vi sætter købstatus det modsatte (ergo !)
-        _annonceRepository.UpdateOne(filter, toggle);
-        //endelig kald til databasen.
+        //Vi skal have fat i alt der IKKE er købt.
+        var filter = Builders<Annonce>.Filter.Eq(a => a.BuyStatus, false);
+        return _annonceRepository.Find(filter).ToList();
     }
 
     public void DeleteAnnonce(int aID)
@@ -69,10 +57,16 @@ public class AnnonceRepository : IAnnonceRepo
         //slet den
     }
 
-/*    public void BuyAnnonce(int aID)
+      public void BuyAnnonce(int aID, int buyerId)
     {
         var filter = Builders<Annonce>.Filter.Eq(a => a.aID, aID);
-        _annonceRepository.
+        var annonce = _annonceRepository.Find(filter).FirstOrDefault();
+        //start med at finde den rette
+
+        var changes = Builders<Annonce>.Update
+            .Set(a => a.BuyStatus, true) //ændr buy status
+            .Set(a => a.BuyerId, buyerId); //sæt buyerid
+        
+        _annonceRepository.UpdateOne(filter, changes);
     }
-    */
 }
