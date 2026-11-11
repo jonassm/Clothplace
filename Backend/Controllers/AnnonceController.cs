@@ -10,7 +10,7 @@ namespace Backend.Controllers;
 [Route("api/controller")]
 public class AnnonceController : ControllerBase
 {
-    private readonly IAnnonceRepo aRepo;
+    private readonly IAnnonceRepo aRepo = new AnnonceRepository();
 
     [HttpPost]
     [Route("create")]
