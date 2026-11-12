@@ -5,6 +5,7 @@
 @rendermode InteractiveServer
 @inject Core.CartClass Cart
 @inject Blazored.LocalStorage.ILocalStorageService LocStore
+@inject IJSRuntime JS
 
 <PageTitle>Marketplace</PageTitle>
 
@@ -30,6 +31,16 @@
     </select>
 </div>
 
+<div>
+    <select name="location" @bind="location" @bind:after="ApplyFilters">
+        <option value="alle">Vilkårlig lokation</option>
+        <option value="A2.02">A2.02</option>
+        <option value="Biblioteket">Biblioteket</option>
+        <option value="Basement">Basement</option>
+        <!-- Dette er slet ikke skalerbart i praksis, men det fungere for nu. -->
+    </select>
+</div>
+
 
 @if (getting) //hvis vi bare laver null tjek på annoncer, vil det aldrig blive skrevet.
     //da annoncer objektet dannes med det samme, og altså ikke er null
@@ -37,15 +48,26 @@
     <p>Henter...</p>
 }
 else if (current.Count == 0) { //Ingen grund til at skrive henter hvis der bare ikke er noget på siden. Self. low risk dog
-    <p>Ingen annoncer at hente</p>
+    <p>Ingen annoncer matcher dine filtre</p>
 }
 else
 {
     @foreach (var a in current)
     {
-        <div>@a.Name , @a.Pris , <button @onclick="() => AddToCart(a)"> Tilføj til kurv</button></div>
+        <div>@a.Name der koster: @a.Pris kr, og findes ved: @a.Lokation , og er en: @a.Kategori i: @a.Stand stand, <button @onclick="() => AddToCart(a)"> Tilføj til kurv</button>
+            
+            
+            <!-- Tyvstjålet af chatten. Men er basically en javascript funktion (alert brugte vi også da vi lærte JS, det er en popup) hvor den så skriver annonces besrkivelse i den alert. -->
+            <button @onclick='() => JS.InvokeVoidAsync("alert", a.Beskrivelse).AsTask()'> 
+                Vis beskrivelse
+            </button>
+            <a href="@a.ImageURL" target="_blank" rel="noopener">  <!-- også tyvstjålet fra chatten, den simpleste måde at vise billede. åbner i ny fane. Men href er jo ikke ligefrem ny.-->
+                Se billede af varen
+            </a>
+            </div>
     }
 }
+
 
 
 @code {
@@ -54,6 +76,7 @@ else
     private List<Annonce> annoncer = new List<Annonce>();
     private List<Annonce> current = new List<Annonce>();
     private string stand = "alle";
+    private string location = "alle";
     private string category = "alle"; //start med alle i kategorien
     private bool getting; //Lav et bool, der ændres til false når man har hentet det hele. Den starter i true, derfor ingen definition her.
     
@@ -82,13 +105,14 @@ else
             if (savedCart != null)
                 Cart.cart = savedCart;
 
-            StateHasChanged();
+            StateHasChanged(); 
         }
     }
 
     private void ApplyFilters()
     {
         current = annoncer.Where(a => 
+                (location == "alle" || a.Lokation == location)  &&
             (category == "alle" || a.Kategori == category) 
             && //and statement
             //              OR statement.
