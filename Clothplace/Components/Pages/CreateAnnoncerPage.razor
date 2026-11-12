@@ -1,0 +1,123 @@
+@page "/CreateAnnocer"
+@using Core;
+@rendermode InteractiveServer
+@inject HttpClient Http
+@inject NavigationManager nav
+
+<h3>CreateAnnoncer</h3>
+
+<EditForm Model="@aAnnonce" OnValidSubmit="@CreateAnnoncer" class="row p-3">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="col-md-12 mb-3">
+        <label for="Name">Navn</label>
+        <InputText id="Name" @bind-Value="aAnnonce.Name" class="form-control" required />
+    </div>
+
+    <div class="col-md-6 mb-3">
+        <label for="Pris">Pris</label>
+        <InputNumber id="Pris" @bind-Value="aAnnonce.Pris" class="form-control" min="0" required />
+    </div>
+
+    <div class="col-md-12 mb-3">
+        <label for="Beskrivelse">Beskrivelse</label>
+        <InputTextArea id="Beskrivelse" @bind-Value="aAnnonce.Beskrivelse" class="form-control" required />
+    </div>
+
+    <div class="col-md-6 mb-3">
+        <label for="Kategori">Kategori</label>
+        <InputSelect id="Kategori" @bind-Value="aAnnonce.Kategori" class="form-control" required>
+            <option value="">-- Vælg kategori --</option>
+            @foreach (var kategori in kategorier)
+            {
+                <option value="@kategori">@kategori</option>
+            }
+        </InputSelect>
+    </div>
+
+    <div class="col-md-6 mb-3">
+        <label for="Stand">Stand</label>
+        <InputSelect id="Stand" @bind-Value="aAnnonce.Stand" class="form-control" required>
+            <option value="">-- Vælg stand --</option>
+            @foreach (var stand in stande)
+            {
+                <option value="@stand">@stand</option>
+            }
+        </InputSelect>
+    </div>
+
+    <div class="col-md-6 mb-3">
+        <label for="Lokation">Lokation</label>
+        <InputSelect id="Lokation" @bind-Value="aAnnonce.Lokation" class="form-control" required>
+            <option value="">-- Vælg lokation --</option>
+            @foreach (var lokation in lokationer)
+            {
+                <option value="@lokation">@lokation</option>
+            }
+        </InputSelect>
+    </div>
+
+    <div class="col-md-12 mb-3">
+        <label for="ImageURL">Billede URL (valgfri)</label>
+        <InputText id="ImageURL" @bind-Value="aAnnonce.ImageURL" class="form-control" placeholder="/img/blue-shirt.png" />
+    </div>
+
+    @if (fejl != null)
+    {
+        <p class="text-danger">@fejl</p>
+    }
+
+    <div class="col-12 mb-3">
+        <button type="submit" class="btn btn-primary">Opret</button>
+        <button type="button" class="btn btn-secondary" @onclick="Cancel">Annuller</button>
+    </div>
+</EditForm>
+
+@code {
+    //Samme værdier som i databasen, så filteret på Marketplace virker.
+    private readonly string[] kategorier = { "Shirt", "Pants", "Dress" };
+    private readonly string[] stande = { "new", "good", "used", "bad", "vbad" };
+    private readonly string[] lokationer = { "A2.02", "Biblioteket", "Basement" }; //samme som i databasen og Marketplace
+
+    //Strings starter tomme, da Annonce ikke tillader null i dem.
+    private Annonce aAnnonce = new Annonce
+    {
+        Name = "",
+        Beskrivelse = "",
+        Kategori = "",
+        Stand = "",
+        Lokation = ""
+    };
+
+    private string? fejl;
+
+    private async Task CreateAnnoncer() // vi laver en annonce
+    {
+        //aID sættes af backenden (GetNextId), så den sender vi ikke selv.
+        aAnnonce.BuyStatus = false; //ny annonce er ikke købt
+        aAnnonce.BuyerId = null;
+        aAnnonce.OwnerID = 0; //TODO: sæt til den loggede brugers id når login virker
+
+        if (string.IsNullOrWhiteSpace(aAnnonce.ImageURL))
+        {
+            aAnnonce.ImageURL = null; //ingen billede = null, som i databasen
+        }
+
+        var response = await Http.PostAsJsonAsync("api/Annonce/create", aAnnonce);
+
+        if (response.IsSuccessStatusCode)
+        {
+            nav.NavigateTo("/User"); //tilbage til User når annoncen er oprettet
+        }
+        else
+        {
+            fejl = "Annoncen kunne ikke oprettes. Prøv igen.";
+        }
+    }
+
+    private void Cancel()
+    {
+        nav.NavigateTo("/User");
+    }
+}
