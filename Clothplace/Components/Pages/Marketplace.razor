@@ -6,31 +6,47 @@
 
 <h3>Marketplace</h3>
 
+<div>
+    <select name="category" @bind="category" @bind:after="() => CategoryFilter(category)">
+        <option value="Shirt">Shirt</option>
+        <option value="Pants">Pants</option>
+        <option value="Dress">Dress</option>
+    </select>
+</div>
 @if (getting) //hvis vi bare laver null tjek på annoncer, vil det aldrig blive skrevet.
     //da annoncer objektet dannes med det samme, og altså ikke er null
 {
     <p>Henter...</p>
 }
-else if (annoncer.Count == 0) { //Ingen grund til at skrive henter hvis der bare ikke er noget på siden. Self. low risk dog
+else if (current.Count == 0) { //Ingen grund til at skrive henter hvis der bare ikke er noget på siden. Self. low risk dog
     <p>Ingen annoncer at hente</p>
 }
 else
 {
-    @foreach (var a in annoncer)
+    @foreach (var a in current)
     {
         <div>@a.Name , @a.Pris</div> //best case scenario, vi kan skrive ind!
     }
 }
 
+
 @code {
 
     private List<Annonce> annoncer = new List<Annonce>();
 
+    private List<Annonce> filter = new List<Annonce>();
+    
+    private List<Annonce> current = new List<Annonce>();
+
+    private string? category = "";
+    
     private bool getting; //Lav et bool, der ændres til false når man har hentet det hele. Den starter i true, derfor ingen definition her.
+    
     private async Task loadAnnonces()
     {
         annoncer = await Http.GetFromJsonAsync<List<Annonce>>("api/Annonce/get") ?? new List<Annonce>();
         getting = false; //nu har vi hentet, så...
+        current = annoncer;
     }
 
     protected override async Task OnInitializedAsync() //ved init kalder vi load annoncer.
@@ -38,7 +54,26 @@ else
         await loadAnnonces();
     }
 
+    public void CategoryFilter(string category)
+    {
+        foreach (Annonce annonce in current)
+        {
+            if (annonce.Kategori.Contains(category))
+            {
+                filter.Add(annonce);
+            }
+        }
+        current = filter;
+    }
 
-
+    public async Task<List<Annonce>> ColorFilter(List<Annonce> annonces)
+    {
+        return null;
+    }
+    
+    public void AddToCart(Annonce annonce)
+    {
+        
+    }
 
 }
