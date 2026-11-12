@@ -1,0 +1,72 @@
+@page "/CartPage"
+@using Core;
+@rendermode InteractiveServer
+@inject Core.CartClass Cart
+@inject Blazored.LocalStorage.ILocalStorageService LocStore
+@inject IJSRuntime JS
+
+
+<h3>Indkøbskurv</h3>
+
+@if (henter)
+{
+    <p>Henter din kurv...</p>
+}
+else if (Cart.cart.Count == 0) {
+    <p>Din kurv er tom</p>
+}
+else //når vi har en kurv at vise
+{
+    @foreach (Annonce a in Cart.cart)
+    {
+        <div>
+            @a.Name der koster: @a.Pris kr, og findes ved: @a.Lokation , og er en: @a.Kategori i: @a.Stand stand
+            
+            
+                <!-- Tyvstjålet af chatten. Men er basically en javascript funktion (alert brugte vi også da vi lærte JS, det er en popup) hvor den så skriver annonces besrkivelse i den alert. -->
+                <button @onclick='() => JS.InvokeVoidAsync("alert", a.Beskrivelse).AsTask()'> 
+                    Vis beskrivelse
+                </button>
+                <a href="@a.ImageURL" target="_blank" rel="noopener">  <!-- også tyvstjålet fra chatten, den simpleste måde at vise billede. åbner i ny fane. Men href er jo ikke ligefrem ny.-->
+                    Se billede af varen
+                </a>
+            <button @onclick="() => RemoveFromCart(a)">Fjern</button>
+        </div>
+    }
+
+    <p>I alt: @Cart.cart.Sum(a => a.Pris) kr.</p>
+    //Sum tager, som man måske kan gætte, en sum af integers. Pris er i integer.
+    
+    <p>
+        <button @onclick="ClearCart">Tøm kurv</button>
+    </p>
+}
+
+
+
+@code {
+    public bool henter;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            var savedCart = await LocStore.GetItemAsync<List<Annonce>>("cart");
+            if (savedCart != null)
+                Cart.cart = savedCart;
+ //samme kode som i marketplace for at hente en kurv.
+            StateHasChanged();
+        }
+    }
+
+    private async Task RemoveFromCart(Annonce annonce)
+    {
+        Cart.RemoveItem(annonce); //trykker vi på remove fjerner vi altså den annonce fra cart.
+        await LocStore.SetItemAsync("cart", Cart.cart); // og opdatere kurven.
+    }
+    private async Task ClearCart()
+    {
+        Cart.cart.Clear(); //clear cart. Clear fjerner alle elemtner fra en liste.
+        await LocStore.RemoveItemAsync("cart"); // og opdater med clear
+    }
+}

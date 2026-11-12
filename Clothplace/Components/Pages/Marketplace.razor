@@ -1,79 +1,135 @@
-﻿@page "/Marketplace"
+﻿@page "/"
+@using System.Data.SqlTypes
 @using Core;
 @inject HttpClient Http
+@rendermode InteractiveServer
+@inject Core.CartClass Cart
+@inject Blazored.LocalStorage.ILocalStorageService LocStore
+@inject IJSRuntime JS
 
 <PageTitle>Marketplace</PageTitle>
 
 <h3>Marketplace</h3>
 
 <div>
-    <select name="category" @bind="category" @bind:after="() => CategoryFilter(category)">
+    <select name="category" @bind="category" @bind:after="ApplyFilters">
+        <option value="alle">Alle kategorier</option>
         <option value="Shirt">Shirt</option>
         <option value="Pants">Pants</option>
         <option value="Dress">Dress</option>
     </select>
 </div>
+
+<div>
+    <select name="stand" @bind="stand" @bind:after="ApplyFilters">
+        <option value="alle">Vilkårlig stand</option>
+        <option value="new">Som ny</option>
+        <option value="good">God</option>
+        <option value="used">Brugt</option>
+        <option value="bad">Dårlig</option>
+        <option value="vbad">Håndværkertilbud</option>
+    </select>
+</div>
+
+<div>
+    <select name="location" @bind="location" @bind:after="ApplyFilters">
+        <option value="alle">Vilkårlig lokation</option>
+        <option value="A2.02">A2.02</option>
+        <option value="Biblioteket">Biblioteket</option>
+        <option value="Basement">Basement</option>
+        <!-- Dette er slet ikke skalerbart i praksis, men det fungere for nu. -->
+    </select>
+</div>
+
+
 @if (getting) //hvis vi bare laver null tjek på annoncer, vil det aldrig blive skrevet.
     //da annoncer objektet dannes med det samme, og altså ikke er null
 {
     <p>Henter...</p>
 }
 else if (current.Count == 0) { //Ingen grund til at skrive henter hvis der bare ikke er noget på siden. Self. low risk dog
-    <p>Ingen annoncer at hente</p>
+    <p>Ingen annoncer matcher dine filtre</p>
 }
 else
 {
     @foreach (var a in current)
     {
-        <div>@a.Name , @a.Pris</div> //best case scenario, vi kan skrive ind!
+        <div>@a.Name der koster: @a.Pris kr, og findes ved: @a.Lokation , og er en: @a.Kategori i: @a.Stand stand, <button @onclick="() => AddToCart(a)"> Tilføj til kurv</button>
+            
+            
+            <!-- Tyvstjålet af chatten. Men er basically en javascript funktion (alert brugte vi også da vi lærte JS, det er en popup) hvor den så skriver annonces besrkivelse i den alert. -->
+            <button @onclick='() => JS.InvokeVoidAsync("alert", a.Beskrivelse).AsTask()'> 
+                Vis beskrivelse
+            </button>
+            <a href="@a.ImageURL" target="_blank" rel="noopener">  <!-- også tyvstjålet fra chatten, den simpleste måde at vise billede. åbner i ny fane. Men href er jo ikke ligefrem ny.-->
+                Se billede af varen
+            </a>
+            </div>
     }
 }
 
 
+
 @code {
 
+    //precons
     private List<Annonce> annoncer = new List<Annonce>();
-
-    private List<Annonce> filter = new List<Annonce>();
-    
     private List<Annonce> current = new List<Annonce>();
-
-    private string? category = "";
-    
+    private string stand = "alle";
+    private string location = "alle";
+    private string category = "alle"; //start med alle i kategorien
     private bool getting; //Lav et bool, der ændres til false når man har hentet det hele. Den starter i true, derfor ingen definition her.
     
-    private async Task loadAnnonces()
+    
+    
+    private async Task loadAnnonces() // til at loade annoncer via HTTP til controller.
     {
         annoncer = await Http.GetFromJsonAsync<List<Annonce>>("api/Annonce/get") ?? new List<Annonce>();
         getting = false; //nu har vi hentet, så...
-        current = annoncer;
+        current = annoncer; //sæt current(viste) til annoncer(alle).
     }
 
     protected override async Task OnInitializedAsync() //ved init kalder vi load annoncer.
     {
         await loadAnnonces();
+
     }
 
-    public void CategoryFilter(string category)
+    
+    //Blev nød til at implemtere for ikke at crashe ved setup. Hvis ikke det vi brugte i undervisning.
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        foreach (Annonce annonce in current)
+        if (firstRender)
         {
-            if (annonce.Kategori.Contains(category))
-            {
-                filter.Add(annonce);
-            }
+            var savedCart = await LocStore.GetItemAsync<List<Annonce>>("cart");
+            if (savedCart != null)
+                Cart.cart = savedCart;
+
+            StateHasChanged(); 
         }
-        current = filter;
     }
 
-    public async Task<List<Annonce>> ColorFilter(List<Annonce> annonces)
+    private void ApplyFilters()
     {
-        return null;
+        current = annoncer.Where(a => 
+                (location == "alle" || a.Lokation == location)  &&
+            (category == "alle" || a.Kategori == category) 
+            && //and statement
+            //              OR statement.
+            //Dvs hvis standen er alle, har vi true/false
+            //er standen god, men der er ingen gode, har vi false/false
+            (stand == "alle" || a.Stand == stand)
+            //JEG ELSKER BOOLSK ALGEBRA!!!
+        ).ToList();//tilføj til listen som er current vi har i linje 73
     }
     
-    public void AddToCart(Annonce annonce)
+    private async Task AddToCart(Annonce annonce) //task async da vi skal snakke med brugerens computer
     {
-        
+        if (!Cart.cart.Any(a => a.aID == annonce.aID)) 
+        { //Tjek om produktet allerede er i cart før vi tilføjer.
+            Cart.cart.Add(annonce);
+            await LocStore.SetItemAsync("cart", Cart.cart);
+        }
     }
 
 }
