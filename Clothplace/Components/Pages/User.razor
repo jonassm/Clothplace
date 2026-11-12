@@ -1,5 +1,100 @@
-﻿<h3>User</h3>
+﻿@page "/User"
+@using Core;
+@inject HttpClient Http
+@rendermode InteractiveServer
+@inject NavigationManager nav
+@inject IJSRuntime JS
+
+<PageTitle>User</PageTitle>
+
+<h3>User</h3>
+
+<button type="button" class="btn btn-primary" @onclick="CreateAnnoncer">Opret annonce</button>
+
+@if (getting) //hvis vi bare laver null tjek på annoncer, vil det aldrig blive skrevet.
+    //da annoncer objektet dannes med det samme, og altså ikke er null
+{
+    <p>Henter...</p>
+}
+else if (current.Count == 0) { //Ingen grund til at skrive henter hvis der bare ikke er noget på siden. Self. low risk dog
+    <p>Du har ingen annoncer</p>
+}
+else
+{
+    @foreach (var a in current)
+    {
+        <div>@a.Name der koster: @a.Pris kr, og findes ved: @a.Lokation , og er en: @a.Kategori i: @a.Stand stand,
+            <button @onclick='() => JS.InvokeVoidAsync("alert", a.Beskrivelse).AsTask()'>
+                Vis beskrivelse
+            </button>
+            <a href="@a.ImageURL" target="_blank" rel="noopener">
+                Se billede af varen
+            </a>
+            <button @onclick="() => DeleteAnnoncer(a)">Slet</button>
+        </div>
+    }
+}
+
+<h4>Solgte annoncer</h4>
+
+@if (getting)
+{
+    <p>Henter...</p>
+}
+else if (sold.Count == 0) //brugeren har ikke solgt noget endnu
+{
+    <p>Du har ikke solgt noget endnu</p>
+}
+else
+{
+    @foreach (var s in sold)
+    {
+        <div>@s.Name solgt for: @s.Pris kr, og er en: @s.Kategori i: @s.Stand stand</div>
+    }
+}
 
 @code {
-    
+
+    //precons
+    private List<Annonce> annoncer = new List<Annonce>();
+    private List<Annonce> current = new List<Annonce>();
+    private List<Annonce> sold = new List<Annonce>(); //brugerens egne annoncer som er solgt
+    private bool getting = true; //starter i true, ændres til false når vi har hentet det hele.
+
+    private async Task loadAnnonces() // til at loade annoncer via HTTP til controller.
+    {
+        int ownerId = 0; //TODO: skift 0 ud med den loggede brugers id når login virker
+
+        annoncer = await Http.GetFromJsonAsync<List<Annonce>>("api/Annonce/get") ?? new List<Annonce>();
+        //api/Annonce/get giver kun ikke-solgte, så solgte henter vi for sig.
+        sold = await Http.GetFromJsonAsync<List<Annonce>>($"api/Annonce/sold/{ownerId}") ?? new List<Annonce>();
+        getting = false; //nu har vi hentet, så...
+        GetUserAnnoncer(ownerId);
+    }
+
+    protected override async Task OnInitializedAsync() //ved init kalder vi load annoncer.
+    {
+        await loadAnnonces();
+    }
+
+    private void GetUserAnnoncer(int ownerId)
+    {
+        current = annoncer.Where(a => a.OwnerID == ownerId).ToList(); //vis kun brugerens egne annoncer
+    }
+
+    private void CreateAnnoncer()
+    {
+        nav.NavigateTo("/CreateAnnocer");
+    }
+
+    private async Task DeleteAnnoncer(Annonce annonce)
+    {
+        var response = await Http.DeleteAsync($"api/Annonce/delete/{annonce.aID}");
+
+        if (response.IsSuccessStatusCode) //kun fjern fra listen hvis backenden siger ok
+        {
+            annoncer.Remove(annonce);
+            current.Remove(annonce);
+        }
+    }
 }

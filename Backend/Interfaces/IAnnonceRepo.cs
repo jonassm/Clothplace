@@ -9,6 +9,8 @@ public interface IAnnonceRepo
 
     public List<Annonce> GetAllAnnonces();
 
+    public List<Annonce> GetSoldAnnonces(int ownerId);
+
     //public void PutToggleBought(int aID);
 
     public void DeleteAnnonce(int aID);
