@@ -48,6 +48,14 @@ public class AnnonceRepository : IAnnonceRepo
         return _annonceRepository.Find(filter).ToList();
     }
 
+    public List<Annonce> GetSoldAnnonces(int ownerId)
+    {
+        //Alt brugeren selv har lagt op (OwnerID), som ER købt.
+        var filter = Builders<Annonce>.Filter.Eq(a => a.OwnerID, ownerId)
+                     & Builders<Annonce>.Filter.Eq(a => a.BuyStatus, true);
+        return _annonceRepository.Find(filter).ToList();
+    }
+
     public void DeleteAnnonce(int aID)
     {
         var filter = Builders<Annonce>.Filter.Eq(a => a.aID, aID);

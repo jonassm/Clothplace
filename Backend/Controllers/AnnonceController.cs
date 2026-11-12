@@ -34,6 +34,13 @@ public class AnnonceController : ControllerBase
     {
         return aRepo.GetAllAnnonces(); //kalder GetAll fra Repo
     }
+
+    [HttpGet]
+    [Route("sold/{ownerId:int}")] //alle solgte annoncer for en bruger
+    public List<Annonce> GetSoldAnnonces(int ownerId)
+    {
+        return aRepo.GetSoldAnnonces(ownerId);
+    }
 /*
     [HttpPatch]
     [Route("toggle/{aID:int}")] //Får et annonce ID, som er integer, som defineret i klassen
