@@ -1,4 +1,6 @@
 using Clothplace.Components;
+using Core;
+using Blazored.LocalStorage;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,6 +13,11 @@ builder.Services.AddSingleton(_ => new HttpClient
     BaseAddress = new Uri("http://localhost:5046/")
 });
 
+builder.Services.AddScoped<CartClass>();
+//Dette gør at vi kan bruge den samme cart i både marketplace og cart.
+//eller skulle man lave en cart på hver side - det virker lidt bims
+
+builder.Services.AddBlazoredLocalStorage(); //local storage
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
