@@ -1,8 +1,9 @@
-@page "/CreateAnnocer"
+﻿@page "/CreateAnnocer"
 @using Core;
 @rendermode InteractiveServer
 @inject HttpClient Http
 @inject NavigationManager nav
+@inject Blazored.LocalStorage.ILocalStorageService LocStore
 
 <h3>CreateAnnoncer</h3>
 
@@ -97,7 +98,12 @@
         //aID sættes af backenden (GetNextId), så den sender vi ikke selv.
         aAnnonce.BuyStatus = false; //ny annonce er ikke købt
         aAnnonce.BuyerId = null;
-        aAnnonce.OwnerID = 0; //TODO: sæt til den loggede brugers id når login virker
+        if (!await LocStore.ContainKeyAsync("id")) //ikke logget ind
+        {
+            nav.NavigateTo("/LoginPage");
+            return;
+        }
+        aAnnonce.OwnerID = await LocStore.GetItemAsync<int>("id"); //den loggede brugers id fra LoginPage
 
         if (string.IsNullOrWhiteSpace(aAnnonce.ImageURL)) //Hvis at URL er null, tom eller bare whitespace (dvs space) ændres det til null.
         {

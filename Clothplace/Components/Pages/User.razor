@@ -4,12 +4,14 @@
 @rendermode InteractiveServer
 @inject NavigationManager nav
 @inject IJSRuntime JS
+@inject Blazored.LocalStorage.ILocalStorageService LocStore
 
 <PageTitle>User</PageTitle>
 
 <h3>User</h3>
 
 <button type="button" class="btn btn-primary" @onclick="CreateAnnoncer">Opret annonce</button>
+<button class="btn btn-secondary" @onclick="Logout">Log ud</button>
 
 @if (getting) //hvis vi bare laver null tjek på annoncer, vil det aldrig blive skrevet.
     //da annoncer objektet dannes med det samme, og altså ikke er null
@@ -61,25 +63,36 @@ else
     private List<Annonce> sold = new List<Annonce>(); //brugerens egne annoncer som er solgt
     private bool getting = true; //starter i true, ændres til false når vi har hentet det hele.
 
-    private async Task loadAnnonces() // til at loade annoncer via HTTP til controller.
+    private async Task loadAnnonces(int userId) // til at loade annoncer via HTTP til controller.
     {
-        int ownerId = 0; //TODO: skift 0 ud med den loggede brugers id når login virker
 
         annoncer = await Http.GetFromJsonAsync<List<Annonce>>("api/Annonce/get") ?? new List<Annonce>();
         //api/Annonce/get giver kun ikke-solgte, så solgte henter vi for sig.
-        sold = await Http.GetFromJsonAsync<List<Annonce>>($"api/Annonce/sold/{ownerId}") ?? new List<Annonce>();
+        sold = await Http.GetFromJsonAsync<List<Annonce>>($"api/Annonce/sold/{userId}") ?? new List<Annonce>();
         getting = false; //nu har vi hentet, så...
-        GetUserAnnoncer(ownerId);
+        GetUserAnnoncer(userId);
     }
 
-    protected override async Task OnInitializedAsync() //ved init kalder vi load annoncer.
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        await loadAnnonces();
+        //LocalStorage kræver JS, som først virker efter første render (ikke under prerender).
+        if (!firstRender) return;
+
+        //Hent id'et som LoginPage gemte. Ikke logget ind = send til login.
+        if (!await LocStore.ContainKeyAsync("id"))
+        {
+            nav.NavigateTo("/LoginPage");
+            return;
+        }
+
+        int userId = await LocStore.GetItemAsync<int>("id");
+        await loadAnnonces(userId);
+        StateHasChanged(); //opdater siden nu hvor data er hentet
     }
 
-    private void GetUserAnnoncer(int ownerId)
+    private void GetUserAnnoncer(int userId)
     {
-        current = annoncer.Where(a => a.OwnerID == ownerId).ToList(); //vis kun brugerens egne annoncer
+        current = annoncer.Where(a => a.OwnerID == userId).ToList(); //vis kun brugerens egne annoncer
     }
 
     private void CreateAnnoncer()
@@ -96,5 +109,11 @@ else
             annoncer.Remove(annonce);
             current.Remove(annonce);
         }
+    }
+
+    private async Task Logout()
+    {
+        await LocStore.RemoveItemAsync("id");
+        nav.NavigateTo("/LoginPage");
     }
 }
