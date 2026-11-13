@@ -21,7 +21,7 @@ public class BrugerController : ControllerBase
     [Route("getUser/{id}")]
     public User getUser(int id)
     {
-        return bRepo.getUser(id);
+        return bRepo.getUserID(id);
     }
 
     [HttpPost]

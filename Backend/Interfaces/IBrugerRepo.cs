@@ -3,7 +3,7 @@ namespace Backend.Repositories.Interfaces;
 
 public interface IBrugerRepo
 {
-    public User getUser(int id);
+    public User getUserID(int id);
 
     public User Login(string email);
 
