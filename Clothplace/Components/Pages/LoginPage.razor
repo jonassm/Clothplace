@@ -1,0 +1,54 @@
+﻿@page "/LoginPage"
+@using Core;
+@rendermode InteractiveServer
+@inject HttpClient Http
+@inject NavigationManager navManager
+
+<h3>LoginPage</h3>
+
+<EditForm OnValidSubmit="CheckEmail">
+    <div class="form-floating-group">
+        <InputText class="form-control" @bind="email" placeholder="Email"/>
+    </div>
+
+    <div class="form-floating-group">
+        <InputText id="pwd" placeholder="Password"></InputText>
+    </div>
+
+    <div>
+        <button type="submit" class="btn btn-primary">Login</button>
+    </div>
+</EditForm>
+
+@if (errorMessage != "")
+{
+    <div class="text-danger">@errorMessage</div>
+}
+
+
+@code {
+
+    private string email = "";
+    
+    private string errorMessage = "";
+
+    
+    public async Task CheckEmail()
+    {
+        // Checker om den skrivende email existerer i vores database
+        // Uri.EscapeDataString gør det muligt for URL'en at bruge bestemte tegn, som fx "@"
+        bool rightEmail = await Http.GetFromJsonAsync<bool>($"api/Bruger/doLogin/{Uri.EscapeDataString(email)}");
+        
+        // Hvis Emailen er korrekt, sendes brugeren til Marketplace siden
+        if (rightEmail)
+        {
+            navManager.NavigateTo("/Marketplace");
+        }
+        else
+        {
+            // ellers får brugeren en fejlmeddelse
+            errorMessage = "Wrong Login";
+        }
+    }
+
+}
