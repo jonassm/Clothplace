@@ -1,4 +1,4 @@
-using Backend.Repositories;
+﻿using Backend.Repositories;
 using Backend.Repositories.Interfaces;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -36,10 +36,10 @@ public class AnnonceController : ControllerBase
     }
 
     [HttpGet]
-    [Route("sold/{ownerId:int}")] //alle solgte annoncer for en bruger
-    public List<Annonce> GetSoldAnnonces(int ownerId)
+    [Route("sold/{userId:int}")] //alle solgte annoncer for en bruger
+    public List<Annonce> GetSoldAnnonces(int userId)
     {
-        return aRepo.GetSoldAnnonces(ownerId);
+        return aRepo.GetSoldAnnonces(userId);
     }
 /*
     [HttpPatch]
