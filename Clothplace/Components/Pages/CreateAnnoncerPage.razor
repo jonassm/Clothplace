@@ -103,7 +103,7 @@
             nav.NavigateTo("/LoginPage");
             return;
         }
-        aAnnonce.OwnerID = await LocStore.GetItemAsync<int>("id"); //den loggede brugers id fra LoginPage
+        aAnnonce.UserId = await LocStore.GetItemAsync<int>("id"); //den loggede brugers id fra LoginPage
 
         if (string.IsNullOrWhiteSpace(aAnnonce.ImageURL)) //Hvis at URL er null, tom eller bare whitespace (dvs space) ændres det til null.
         {

@@ -1,4 +1,4 @@
-using MongoDB.Bson.Serialization.Attributes;
+﻿using MongoDB.Bson.Serialization.Attributes;
 
 namespace Core;
 
@@ -18,7 +18,8 @@ public class Annonce
     public int Pris { get; set; }
     public bool BuyStatus { get; set; }
     public string? ImageURL { get; set; } // ? da ikke krav om billede
-    public int OwnerID { get; set; }
+    [BsonElement("OwnerID")] //feltet hedder stadig OwnerID i Mongo, så gamle annoncer virker
+    public int UserId { get; set; } //id på brugeren der har lavet annoncen (User.UserId)
     public int? BuyerId { get; set; } // int? da den ikke starter købt.
     public string Lokation { get; set; }
 }

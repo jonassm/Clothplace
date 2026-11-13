@@ -92,7 +92,7 @@ else
 
     private void GetUserAnnoncer(int userId)
     {
-        current = annoncer.Where(a => a.OwnerID == userId).ToList(); //vis kun brugerens egne annoncer
+        current = annoncer.Where(a => a.UserId == userId).ToList(); //vis kun brugerens egne annoncer
     }
 
     private void CreateAnnoncer()

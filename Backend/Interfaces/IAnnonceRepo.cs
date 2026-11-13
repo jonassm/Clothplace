@@ -1,4 +1,4 @@
-using Core;
+﻿using Core;
 
 namespace Backend.Repositories.Interfaces;
 
@@ -9,7 +9,7 @@ public interface IAnnonceRepo
 
     public List<Annonce> GetAllAnnonces();
 
-    public List<Annonce> GetSoldAnnonces(int ownerId);
+    public List<Annonce> GetSoldAnnonces(int userId);
 
     //public void PutToggleBought(int aID);
 
