@@ -3,17 +3,20 @@
 @rendermode InteractiveServer
 @inject HttpClient Http
 @inject NavigationManager navManager
+@inject Blazored.LocalStorage.ILocalStorageService LocStore
 
 <h3>LoginPage</h3>
 
-<EditForm OnValidSubmit="CheckEmail">
+<EditForm Model="loginform" OnValidSubmit="CheckEmail">
+    
     <div class="form-floating-group">
-        <InputText class="form-control" @bind="email" placeholder="Email"/>
+        <InputText class="form-control" @bind-Value="loginform.email" placeholder="Email"/>
     </div>
 
     <div class="form-floating-group">
-        <InputText id="pwd" placeholder="Password"></InputText>
+        <InputText @bind-Value="loginform.password" placeholder="Password"></InputText>
     </div>
+    <!-- Password er ligegyldigt for nu -->
 
     <div>
         <button type="submit" class="btn btn-primary">Login</button>
@@ -32,17 +35,32 @@
     
     private string errorMessage = "";
 
+    private Core.User loginform = new()
+    {
+        //loginform er den form brugeren udfylder, som retruner en User
+        email = "",
+        password = ""
+    };
     
     public async Task CheckEmail()
     {
         // Checker om den skrivende email existerer i vores database
         // Uri.EscapeDataString gør det muligt for URL'en at bruge bestemte tegn, som fx "@"
-        bool rightEmail = await Http.GetFromJsonAsync<bool>($"api/Bruger/doLogin/{Uri.EscapeDataString(email)}");
+        var response = await Http.PostAsync($"api/Bruger/doLogin/{Uri.EscapeDataString(loginform.email)}", null); //escapedatastring encoder emailen korrekt til backend
+        //null til sidst er fordi postasync skal bruge to argumenter, men vi bruger kun en. ved ikke hvad den anden løsning vil være
         
         // Hvis Emailen er korrekt, sendes brugeren til Marketplace siden
-        if (rightEmail)
+        if (response.IsSuccessStatusCode) //hvis vi får status 200
         {
-            navManager.NavigateTo("/Marketplace");
+            var user = await response.Content.ReadFromJsonAsync<Core.User>();
+            /*
+             * Når vi får 200 responsen, sender mongo hele user objektet til os (response.content)
+             * I user objektet, som defineret i user.cs, ligger vores id. Det læser vi her.
+             * Onde tunger vil mene man skal lave if null statements her, men vi går ud fra det ikke er fucked op
+             */
+                await LocStore.SetItemAsync<int>("id", user.UserId);
+                navManager.NavigateTo("/");
+            
         }
         else
         {

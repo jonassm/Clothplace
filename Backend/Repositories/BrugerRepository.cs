@@ -19,7 +19,7 @@ public class BrugerRepository : IBrugerRepo
         _brugerRepository = database.GetCollection<User>("Users");
     }
 
-    public User getUser(int id)
+    public User getUserID(int id)
     {
         var filter = Builders<User>.Filter.Eq("_id", id);
         return _brugerRepository.Find(filter).FirstOrDefault();
@@ -37,12 +37,4 @@ public class BrugerRepository : IBrugerRepo
     {
         _brugerRepository.InsertOne(user);
     }
-
-    /**
-    public string getPasswordByName(string name)
-    {
-        var filter = Builders<User>.Filter.Eq("Name", name);
-        return _BrugerRepository.Find(filter).FirstOrDefault();
-    }
-    **/
 }

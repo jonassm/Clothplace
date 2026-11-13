@@ -99,14 +99,14 @@
         aAnnonce.BuyerId = null;
         aAnnonce.OwnerID = 0; //TODO: sæt til den loggede brugers id når login virker
 
-        if (string.IsNullOrWhiteSpace(aAnnonce.ImageURL))
+        if (string.IsNullOrWhiteSpace(aAnnonce.ImageURL)) //Hvis at URL er null, tom eller bare whitespace (dvs space) ændres det til null.
         {
             aAnnonce.ImageURL = null; //ingen billede = null, som i databasen
         }
 
         var response = await Http.PostAsJsonAsync("api/Annonce/create", aAnnonce);
 
-        if (response.IsSuccessStatusCode)
+        if (response.IsSuccessStatusCode) //hvis response er 200, så..
         {
             nav.NavigateTo("/User"); //tilbage til User når annoncen er oprettet
         }
