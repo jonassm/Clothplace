@@ -4,6 +4,8 @@
 @inject Core.CartClass Cart
 @inject Blazored.LocalStorage.ILocalStorageService LocStore
 @inject IJSRuntime JS
+@inject HttpClient Http
+@inject NavigationManager navManager
 
 
 <h3>Indkøbskurv</h3>
@@ -36,6 +38,10 @@ else //når vi har en kurv at vise
 
     <p>I alt: @Cart.cart.Sum(a => a.Pris) kr.</p>
     //Sum tager, som man måske kan gætte, en sum af integers. Pris er i integer.
+    <p>
+        <button @onclick="BuyCart">Køb kurven</button>
+    </p>
+    
     
     <p>
         <button @onclick="ClearCart">Tøm kurv</button>
@@ -69,4 +75,31 @@ else //når vi har en kurv at vise
         Cart.cart.Clear(); //clear cart. Clear fjerner alle elemtner fra en liste.
         await LocStore.RemoveItemAsync("cart"); // og opdater med clear
     }
+
+    private async Task BuyAnnonce(Annonce annonce)
+    {
+        var buyerId = await LocStore.GetItemAsync<int?>("id");
+        if (buyerId is null)
+            navManager.NavigateTo("/LoginPage");
+        
+        //forhåbentlig ikke relevant, men skulle man forvirre sig herind uden at logge ind er det et fint tjek.
+        //Man kunne også kalde buyerId et int og ikke have ? men så vil siden bare crashe her
+        var response = await Http.PatchAsync($"api/Annonce/buy/{annonce.aID}?BuyerId={buyerId.Value}", null);
+
+        if (response.IsSuccessStatusCode)
+            await RemoveFromCart(annonce); //skal ikke være clear cart da det her er pr. objekt.
+        
+        else
+            await JS.InvokeVoidAsync("alert", "Fejl ved køb");
+        //send fejlbesked istedet for at lave et crash. JS InvokeVoidAsync benytter JavaScript til at sende en alert.
+    }
+
+    private async Task BuyCart() //Det vi kalder ved knappen, som så kører BuyAnnonce på hver item.
+    {
+        foreach (Annonce a in Cart.cart.ToList())
+        {
+            await BuyAnnonce(a);
+        }
+    }
+    
 }
