@@ -55,10 +55,29 @@ else
     }
 }
 
+<h4>Købte annoncer</h4>
+
+@if (getting)
+{
+    <p>Henter...</p>
+}
+else if (bought.Count == 0) //brugeren har ikke solgt noget endnu
+{
+    <p>Du har ikke købt noget endnu.</p>
+}
+else
+{
+    @foreach (var a in bought)
+    {
+        <div>@a.Name købt for for: @a.Pris kr, og er en: @a.Kategori i: @a.Stand stand</div>
+    }
+}
+
 @code {
 
     //precons
     private List<Annonce> annoncer = new List<Annonce>();
+    private List<Annonce> bought = new List<Annonce>();
     private List<Annonce> current = new List<Annonce>();
     private List<Annonce> sold = new List<Annonce>(); //brugerens egne annoncer som er solgt
     private bool getting = true; //starter i true, ændres til false når vi har hentet det hele.
@@ -69,6 +88,7 @@ else
         annoncer = await Http.GetFromJsonAsync<List<Annonce>>("api/Annonce/get") ?? new List<Annonce>();
         //api/Annonce/get giver kun ikke-solgte, så solgte henter vi for sig.
         sold = await Http.GetFromJsonAsync<List<Annonce>>($"api/Annonce/sold/{userId}") ?? new List<Annonce>();
+        bought = await Http.GetFromJsonAsync<List<Annonce>>($"api/Annonce/bought/{userId}") ?? new List<Annonce>();
         getting = false; //nu har vi hentet, så...
         GetUserAnnoncer(userId);
     }
