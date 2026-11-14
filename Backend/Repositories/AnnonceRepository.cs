@@ -76,16 +76,15 @@ public class AnnonceRepository : IAnnonceRepo
         //slet den
     }
 
-      public void BuyAnnonce(int aID, int buyerId)
+    public void BuyAnnonce(int aID, int buyerId)
     {
-        var filter = Builders<Annonce>.Filter.Eq(a => a.aID, aID);
-        var annonce = _annonceRepository.Find(filter).FirstOrDefault();
-        //start med at finde den rette
+        var filter = Builders<Annonce>.Filter.Eq(a => a.aID, aID)
+            & Builders<Annonce>.Filter.Eq(a => a.BuyStatus, false); //tjek ikke købt i forvejen
 
         var changes = Builders<Annonce>.Update
             .Set(a => a.BuyStatus, true) //ændr buy status
             .Set(a => a.BuyerId, buyerId); //sæt buyerid
-        
+
         _annonceRepository.UpdateOne(filter, changes);
     }
 }
