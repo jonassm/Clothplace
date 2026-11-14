@@ -55,6 +55,17 @@ public class AnnonceRepository : IAnnonceRepo
                      & Builders<Annonce>.Filter.Eq(a => a.BuyStatus, true);
         return _annonceRepository.Find(filter).ToList();
     }
+//Man kunne slippe for to af dem her hvis man filtreret inde i frontend. Men der er nok også et sikkerheds
+//hensyn i.fht at sende alt til brugeren i getallannonces.
+    
+    public List<Annonce> GetBoughtAnnoncesUser(int userId)
+    {
+        var filter = Builders<Annonce>.Filter.Eq(a => a.BuyerId, userId)
+            &
+            Builders<Annonce>.Filter.Eq(a => a.BuyStatus, true);
+        
+        return _annonceRepository.Find(filter).ToList();
+    }
 
     public void DeleteAnnonce(int aID)
     {
