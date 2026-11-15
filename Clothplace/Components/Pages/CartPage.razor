@@ -17,22 +17,28 @@ else if (Cart.cart.Count == 0) {
 }
 else //når vi har en kurv at vise
 {
-    @foreach (Annonce a in Cart.cart)
-    {
-        <div>
-            @a.Name der koster: @a.Pris kr, og findes ved: @a.Lokation , og er en: @a.Kategori i: @a.Stand stand
-            
-            
-                <!-- Tyvstjålet af chatten. Men er basically en javascript funktion (alert brugte vi også da vi lærte JS, det er en popup) hvor den så skriver annonces besrkivelse i den alert. -->
-                <button @onclick='() => JS.InvokeVoidAsync("alert", a.Beskrivelse).AsTask()'> 
-                    Vis beskrivelse
-                </button>
-                <a href="@a.ImageURL" target="_blank" rel="noopener">  <!-- også tyvstjålet fra chatten, den simpleste måde at vise billede. åbner i ny fane. Men href er jo ikke ligefrem ny.-->
-                    Se billede af varen
-                </a>
-            <button @onclick="() => RemoveFromCart(a)">Fjern</button>
-        </div>
-    }
+    <div class="liste">
+        @foreach (Annonce a in Cart.cart)
+        {
+            <div>
+                <div class="annonceNavn">@a.Name</div>
+                <div class="annoncePris">@a.Pris kr.</div>
+                <div class="annonceInfo">
+                    Ved: @a.Lokation · Kategori: @a.Kategori · Stand: @a.Stand
+                </div>
+                <div class="annonceBeskrivelse">
+                    <!-- Tyvstjålet af chatten. Men er basically en javascript funktion (alert brugte vi også da vi lærte JS, det er en popup) hvor den så skriver annonces besrkivelse i den alert. -->
+                    <button @onclick='() => JS.InvokeVoidAsync("alert", a.Beskrivelse).AsTask()'> 
+                        Vis beskrivelse
+                    </button>
+                    <img class="annoncePicture" src="@a.ImageURL" alt="@a.Name" />
+                </div>
+                <button @onclick="() => RemoveFromCart(a)">Fjern</button>
+            </div>
+        }
+    </div>
+    
+    
 
     <p>I alt: @Cart.cart.Sum(a => a.Pris) kr.</p>
     //Sum tager, som man måske kan gætte, en sum af integers. Pris er i integer.

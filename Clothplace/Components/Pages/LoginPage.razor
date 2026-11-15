@@ -7,21 +7,23 @@
 
 <h3>LoginPage</h3>
 
-<EditForm Model="loginform" OnValidSubmit="CheckEmail">
-    
-    <div class="form-floating-group">
-        <InputText class="form-control" @bind-Value="loginform.email" placeholder="Email"/>
-    </div>
+<div class="login">
+    <EditForm Model="loginform" OnValidSubmit="CheckEmail">
+        <div class="form-floating-group">
+            <InputText @bind-Value="loginform.email" placeholder="Email"/>
+        </div>
 
-    <div class="form-floating-group">
-        <InputText @bind-Value="loginform.password" placeholder="Password"></InputText>
-    </div>
-    <!-- Password er ligegyldigt for nu -->
+        <div class="form-floating-group">
+            <InputText @bind-Value="loginform.password" placeholder="Password"></InputText>
+        </div>
+        <!-- Password er ligegyldigt for nu -->
 
-    <div>
-        <button type="submit" class="btn btn-primary">Login</button>
-    </div>
-</EditForm>
+        <div>
+            <button type="submit" class="btn btn-primary">Login</button>
+        </div>
+    </EditForm>
+
+</div>
 
 @if (errorMessage != "")
 {

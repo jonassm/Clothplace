@@ -10,36 +10,38 @@
 <PageTitle>Marketplace</PageTitle>
 
 <h3>Marketplace</h3>
+<div class="filter">
+    <div>
+        <select name="category" @bind="category" @bind:after="ApplyFilters">
+            <option value="alle">Alle kategorier</option>
+            <option value="Shirt">Shirt</option>
+            <option value="Pants">Pants</option>
+            <option value="Dress">Dress</option>
+        </select>
+    </div>
 
-<div>
-    <select name="category" @bind="category" @bind:after="ApplyFilters">
-        <option value="alle">Alle kategorier</option>
-        <option value="Shirt">Shirt</option>
-        <option value="Pants">Pants</option>
-        <option value="Dress">Dress</option>
-    </select>
+    <div>
+        <select name="stand" @bind="stand" @bind:after="ApplyFilters">
+            <option value="alle">Vilkårlig stand</option>
+            <option value="new">Som ny</option>
+            <option value="good">God</option>
+            <option value="used">Brugt</option>
+            <option value="bad">Dårlig</option>
+            <option value="vbad">Håndværkertilbud</option>
+        </select>
+    </div>
+
+    <div>
+        <select name="location" @bind="location" @bind:after="ApplyFilters">
+            <option value="alle">Vilkårlig lokation</option>
+            <option value="A2.02">A2.02</option>
+            <option value="Biblioteket">Biblioteket</option>
+            <option value="Basement">Basement</option>
+            <!-- Dette er slet ikke skalerbart i praksis, men det fungere for nu. -->
+        </select>
+    </div>    
 </div>
 
-<div>
-    <select name="stand" @bind="stand" @bind:after="ApplyFilters">
-        <option value="alle">Vilkårlig stand</option>
-        <option value="new">Som ny</option>
-        <option value="good">God</option>
-        <option value="used">Brugt</option>
-        <option value="bad">Dårlig</option>
-        <option value="vbad">Håndværkertilbud</option>
-    </select>
-</div>
-
-<div>
-    <select name="location" @bind="location" @bind:after="ApplyFilters">
-        <option value="alle">Vilkårlig lokation</option>
-        <option value="A2.02">A2.02</option>
-        <option value="Biblioteket">Biblioteket</option>
-        <option value="Basement">Basement</option>
-        <!-- Dette er slet ikke skalerbart i praksis, men det fungere for nu. -->
-    </select>
-</div>
 
 
 @if (getting) //hvis vi bare laver null tjek på annoncer, vil det aldrig blive skrevet.
@@ -52,20 +54,25 @@ else if (current.Count == 0) { //Ingen grund til at skrive henter hvis der bare 
 }
 else
 {
-    @foreach (var a in current)
-    {
-        <div>@a.Name der koster: @a.Pris kr, og findes ved: @a.Lokation , og er en: @a.Kategori i: @a.Stand stand, <button @onclick="() => AddToCart(a)"> Tilføj til kurv</button>
-            
-            
-            <!-- Tyvstjålet af chatten. Men er basically en javascript funktion (alert brugte vi også da vi lærte JS, det er en popup) hvor den så skriver annonces besrkivelse i den alert. -->
-            <button @onclick='() => JS.InvokeVoidAsync("alert", a.Beskrivelse).AsTask()'> 
-                Vis beskrivelse
-            </button>
-            <a href="@a.ImageURL" target="_blank" rel="noopener">  <!-- også tyvstjålet fra chatten, den simpleste måde at vise billede. åbner i ny fane. Men href er jo ikke ligefrem ny.-->
-                Se billede af varen
-            </a>
+    <div class="liste">
+        @foreach (var a in current)
+        {
+            <div class="annonceMain">
+                <div class="annonceNavn">@a.Name</div>
+                <div class="annoncePris">@a.Pris kr.</div>
+                <div class="annonceInfo">
+                    Ved: @a.Lokation · Kategori: @a.Kategori · Stand: @a.Stand
+                </div>
+                <div class="annonceBuy">
+                    <button @onclick="() => AddToCart(a)">Tilføj til kurv</button>
+                    <button @onclick='() => JS.InvokeVoidAsync("alert", a.Beskrivelse).AsTask()'>
+                        Vis beskrivelse
+                    </button>
+                    <img class="annoncePicture" src="@a.ImageURL" alt="@a.Name" />
+                </div>
             </div>
-    }
+        }
+    </div>
 }
 
 
