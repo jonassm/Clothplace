@@ -32,7 +32,7 @@ else
                 <div class="annonceInfo">
                     Ved: @a.Lokation · Kategori: @a.Kategori · Stand: @a.Stand
                 </div>
-                <div class="annonceBeskrivelse">
+                <div class="annonceBeskrivelse"> 
                     <button @onclick='() => JS.InvokeVoidAsync("alert", a.Beskrivelse).AsTask()'>
                         Vis beskrivelse
                     </button>
@@ -40,7 +40,7 @@ else
                 </div>
                 <button @onclick="() => DeleteAnnoncer(a)">Slet</button>
             </div>
-        }
+        } 
     </div>
 }
 
