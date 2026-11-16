@@ -1,4 +1,4 @@
-﻿﻿@page "/"
+﻿@page "/"
 @using System.Data.SqlTypes
 @using Core;
 @inject HttpClient Http
@@ -14,20 +14,20 @@
     <div>
         <select name="category" @bind="category" @bind:after="ApplyFilters">
             <option value="alle">Alle kategorier</option>
-            <option value="Shirt">Shirt</option>
-            <option value="Pants">Pants</option>
-            <option value="Dress">Dress</option>
+            <option value="Skjorte">Skjorte</option>
+            <option value="Bukser">Bukser</option>
+            <option value="Kjole">Kjole</option>
         </select>
     </div>
 
     <div>
         <select name="stand" @bind="stand" @bind:after="ApplyFilters">
             <option value="alle">Vilkårlig stand</option>
-            <option value="new">Som ny</option>
-            <option value="good">God</option>
-            <option value="used">Brugt</option>
-            <option value="bad">Dårlig</option>
-            <option value="vbad">Håndværkertilbud</option>
+            <option value="Som ny">Som ny</option>
+            <option value="God">God</option>
+            <option value="Brugt">Brugt</option>
+            <option value="Dårlig">Dårlig</option>
+            <option value="Håndværkertilbud">Håndværkertilbud</option>
         </select>
     </div>
 
