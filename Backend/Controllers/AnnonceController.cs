@@ -36,6 +36,13 @@ public class AnnonceController : ControllerBase
     }
 
     [HttpGet]
+    [Route("bought/{userId:int}")]
+    public List<Annonce> GetBoughtAnnoncesUser(int userId)
+    {
+        return aRepo.GetBoughtAnnoncesUser(userId);
+    }
+
+    [HttpGet]
     [Route("sold/{userId:int}")] //alle solgte annoncer for en bruger
     public List<Annonce> GetSoldAnnonces(int userId)
     {

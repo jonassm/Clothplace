@@ -55,6 +55,17 @@ public class AnnonceRepository : IAnnonceRepo
                      & Builders<Annonce>.Filter.Eq(a => a.BuyStatus, true);
         return _annonceRepository.Find(filter).ToList();
     }
+//Man kunne slippe for to af dem her hvis man filtreret inde i frontend. Men der er nok også et sikkerheds
+//hensyn i.fht at sende alt til brugeren i getallannonces.
+    
+    public List<Annonce> GetBoughtAnnoncesUser(int userId)
+    {
+        var filter = Builders<Annonce>.Filter.Eq(a => a.BuyerId, userId)
+            &
+            Builders<Annonce>.Filter.Eq(a => a.BuyStatus, true);
+        
+        return _annonceRepository.Find(filter).ToList();
+    }
 
     public void DeleteAnnonce(int aID)
     {
@@ -65,16 +76,15 @@ public class AnnonceRepository : IAnnonceRepo
         //slet den
     }
 
-      public void BuyAnnonce(int aID, int buyerId)
+    public void BuyAnnonce(int aID, int buyerId)
     {
-        var filter = Builders<Annonce>.Filter.Eq(a => a.aID, aID);
-        var annonce = _annonceRepository.Find(filter).FirstOrDefault();
-        //start med at finde den rette
+        var filter = Builders<Annonce>.Filter.Eq(a => a.aID, aID)
+            & Builders<Annonce>.Filter.Eq(a => a.BuyStatus, false); //tjek ikke købt i forvejen
 
         var changes = Builders<Annonce>.Update
             .Set(a => a.BuyStatus, true) //ændr buy status
             .Set(a => a.BuyerId, buyerId); //sæt buyerid
-        
+
         _annonceRepository.UpdateOne(filter, changes);
     }
 }

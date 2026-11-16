@@ -10,6 +10,8 @@ public interface IAnnonceRepo
     public List<Annonce> GetAllAnnonces();
 
     public List<Annonce> GetSoldAnnonces(int userId);
+    
+    public List<Annonce> GetBoughtAnnoncesUser(int userId);
 
     //public void PutToggleBought(int aID);
 
