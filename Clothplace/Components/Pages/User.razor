@@ -23,18 +23,25 @@ else if (current.Count == 0) { //Ingen grund til at skrive henter hvis der bare 
 }
 else
 {
-    @foreach (var a in current)
-    {
-        <div>@a.Name der koster: @a.Pris kr, og findes ved: @a.Lokation , og er en: @a.Kategori i: @a.Stand stand,
-            <button @onclick='() => JS.InvokeVoidAsync("alert", a.Beskrivelse).AsTask()'>
-                Vis beskrivelse
-            </button>
-            <a href="@a.ImageURL" target="_blank" rel="noopener">
-                Se billede af varen
-            </a>
-            <button @onclick="() => DeleteAnnoncer(a)">Slet</button>
-        </div>
-    }
+    <div class="liste">
+        @foreach (var a in current)
+        {
+            <div class="annonceMain">
+                <div class="annonceNavn">@a.Name</div>
+                <div class="annoncePris">@a.Pris kr.</div>
+                <div class="annonceInfo">
+                    Ved: @a.Lokation · Kategori: @a.Kategori · Stand: @a.Stand
+                </div>
+                <div class="annonceBeskrivelse">
+                    <button @onclick='() => JS.InvokeVoidAsync("alert", a.Beskrivelse).AsTask()'>
+                        Vis beskrivelse
+                    </button>
+                    <img class="annoncePicture" src="@a.ImageURL" alt="@a.Name" />
+                </div>
+                <button @onclick="() => DeleteAnnoncer(a)">Slet</button>
+            </div>
+        }
+    </div>
 }
 
 <h4>Solgte annoncer</h4>
